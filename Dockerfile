@@ -1,23 +1,39 @@
-# Why node:8 and not node:10? Because (a) v8 is LTS, so more likely to be stable, and (b) "npm update" on node:10 breaks on Docker on Linux (but not on OSX, oddly)
-FROM node:8-slim
+FROM node:10-buster
 
-RUN apt-get update \
-  && DEBIAN_FRONTEND=noninteractive apt-get install -y nodejs-legacy npm git libboost1.55-all libssl-dev \
-  && rm -rf /var/lib/apt/lists/* && \
-  chmod +x /wait-for-it.sh
+# Install necessary packages
+RUN apt-get update && apt-get install -y \
+    curl \
+    libssl-dev \
+    libboost-all-dev \
+    libsodium-dev \
+    redis-server \
+    && rm -rf /var/lib/apt/lists/*
 
-ADD . /pool/
-WORKDIR /pool/
+# Set the working directory
+WORKDIR /app
 
-RUN npm update
+# Copy all files to the container
+COPY . .
 
-RUN mkdir -p /config
+# To edit package.json so dependency issues don't arise
+RUN sed -i 's|git://github.com|git+https://github.com|' package.json \
+    && sed -i 's|"bignum": *".*"|"bignum": "0.13.0"|' package.json \
+    && sed -i 's|"dateformat": *".*"|"dateformat": "3.0.3"|' package.json \
+    && sed -i 's|"mailgun.js": *".*"|"mailgun.js": "2.0.1"|' package.json \
+    && sed -i 's|"node-telegram-bot-api": *".*"|"node-telegram-bot-api": "^0.66.0"|' package.json \
+    && sed -i 's|"redis": *".*"|"redis": "2.8.0"|' package.json \
+    && sed -i 's|"request": *".*"|"request": "2.88.0"|' package.json \
+    && sed -i 's|"request-promise-native": *".*"|"request-promise-native": "1.0.7"|' package.json
 
-EXPOSE 8117
-EXPOSE 3333
-EXPOSE 5555
-EXPOSE 7777
+# Install npm dependencies
+RUN npm install
 
-VOLUME ["/config"]
+# Uncomment and modify the following lines as necessary for your project
+RUN cp config_examples/ryo.json config.json
+RUN sed -i 's|"poolAddress": *".*"|"poolAddress": "${POOL_ADDRESS}"|' config.json
+RUN apt-get update && apt-get install -y jq
+RUN jq '.daemon.port = 12211' config.json > config.tmp && mv config.tmp config.json
 
-CMD node init.js -config=/config/config.json
+RUN redis-server --daemonize yes
+RUN node init.js
+
