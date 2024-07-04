@@ -17,8 +17,7 @@ COPY . .
 # Install npm dependencies
 RUN npm install
 
-# Uncomment and modify the following lines as necessary for your project
-RUN sed -i 's|"poolAddress": *".*"|"poolAddress": "RYoLshZp8BCCkCa3pon5i3HW1XK18UaieFwb8knfhdbYAEVC1VMxD7PVF97CdDarhjSFJmdVYEuwC4EqzKB6Ya99R8AeaYe8TAH"|' config.json
+RUN sed -i 's|"poolAddress": *".*"|"poolAddress": "your_pool_address"|' config.json
 
 CMD ["node", "init.js"]
 

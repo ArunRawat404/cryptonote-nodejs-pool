@@ -27,7 +27,7 @@
     "poolServer": {
         "enabled": true,
         "clusterForks": "auto",
-        "poolAddress": "RYoLshZp8BCCkCa3pon5i3HW1XK18UaieFwb8knfhdbYAEVC1VMxD7PVF97CdDarhjSFJmdVYEuwC4EqzKB6Ya99R8AeaYe8TAH",
+        "poolAddress": "your_pool_address",
 	      "addressValidatorBin": "bin/ryo-address-validator",
         "blockRefreshInterval": 1000,
         "minerTimeout": 900,

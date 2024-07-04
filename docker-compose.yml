@@ -5,7 +5,7 @@ services:
     ports:
       - '6379:6379'
     volumes:
-      - redis-data:/data  # Use named volume for persistent data
+      - redis-data:/data  
     networks:
       - pool-network
     extra_hosts:
@@ -24,7 +24,6 @@ services:
       - '9999:9999'
     environment:
       POOL_ADDRESS: "address of ryo"
-      # Use service name for connection (preferred)
       REDIS_HOST: redis
       REDIS_AUTH: null
       REDIS_DB: 0
